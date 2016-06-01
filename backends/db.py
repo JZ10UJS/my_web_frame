@@ -5,7 +5,7 @@
 """
 提供对MySQLdb的封装
 外部调用方式：
-    import db
+    from backends import db
     db.create_engine(user, passwd, db, **kw)
     db.insert(table, **kw)           --> return cursor.rowcount
     db.update(sql, *args)            --> return cursor.rowcount
