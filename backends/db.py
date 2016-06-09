@@ -5,12 +5,15 @@
 """
 提供对MySQLdb的封装
 外部调用方式：
-    from backends import db
+    import db
     db.create_engine(user, passwd, db, **kw)
     db.insert(table, **kw)           --> return cursor.rowcount
     db.update(sql, *args)            --> return cursor.rowcount
     db.select_one(sql, *args)        --> return Dict object or None
     db.select(sql, *args)            --> return [Dictobj, ..., Dictobj] or []
+
+// TODO:
+    提供事务操作，用以修复orm中Model类中 insert(self)的BUG
 """
 
 

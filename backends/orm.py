@@ -4,6 +4,7 @@
 
 """
 ORM的实现
+
 Field:
     1. count主要用于 Models字段在数据表的字段顺序
     2. ddl 字段描述 如: varchar(255) 或 int 或 double
@@ -34,6 +35,9 @@ Model:
         插入数据库, 由于默认添加主键, 插入之后，执行查找, 然后self.id = id // 有BUG 
     4. update(self): 对数据更新
     5. delte(self): 删除数据库中记录
+
+// TODO:
+    1. 提供ForeignKey字段
 """
 
 
