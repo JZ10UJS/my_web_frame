@@ -30,9 +30,9 @@ Model:
     2. 类方法:
         cls.get(**kw): 返回满足要求的第一条记录，并将其转换为对应 cls 的instance 或 None
         cls.filter(**kw): 返回一组cls instance 或 []
-        cls.create(**kw): 调用self.insert()返回 cls instance  // 有BUG
+        cls.create(**kw): 调用self.insert()返回 cls instance  // 有BUG -修复
     3. insert(self):
-        插入数据库, 由于默认添加主键, 插入之后，执行查找, 然后self.id = id // 有BUG 
+        插入数据库, 由于默认添加主键, 插入之后，执行查找, 然后self.id = id // 有BUG - 修复
     4. update(self): 对数据更新
     5. delte(self): 删除数据库中记录
 
@@ -185,14 +185,26 @@ class Model(dict):
         解决方法:
             在db中添加新方法
             新建conn, 插入, 查询, conn.commit(), conn.close()
+
+        已经修复
         """
         params = {}
         for k, v in self.__mappings__.items():
             if not hasattr(self, k):
                 self[k] = v.default
             params[k] = getattr(self, k)
-        db.insert(self.__table__, **params)
-        d = self.filter(**params)[-1]
+
+        names, values = zip(*params.items())
+        insert_sql = 'INSERT INTO `%s`(%s) VALUES(%s)' % (
+            self.__table__,
+            ', '.join('`%s`' % name for name in names),
+            ', '.join('?' for i in range(len(names)))
+        )    
+
+        select_sql = 'select * from `%s` where ' % self.__table__
+        select_sql += ' and '.join('%s=?'%k for k in names)
+        
+        d = db._do_sql([(insert_sql, values), (select_sql, values)])
         
         self.id = d.id
 
@@ -223,5 +235,6 @@ if __name__ == '__main__':
         create_time = TimeField()
         content = TextField()
     b = Blog()
+    b.insert()
     print b.__sql__()
     print b.__table__

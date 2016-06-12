@@ -221,6 +221,27 @@ def update(sql, *args):
     return _update(sql, *args)
 
 
+@with_connection
+def _do_sql(sqls):
+    """only for orm insert method"""
+    cursor = None
+    try:
+        cursor = _db_ctx.cursor()
+        for infos in sqls:
+            logging.info('do SQL: %s, ARGS: %s' % infos)
+            cursor.execute(infos[0].replace('?','%s'), infos[1])
+        names = [i[0] for i in cursor.description]
+        values = cursor.fetchone()
+        return Dict(names, values)
+    except Exception as e:
+        logging.exception(e)
+        _db_ctx.connection.rollback()
+        logging.error('bad sql, cursor rollback.')
+    else:
+        _db_ctx.connection.commit()
+    finally:
+        cursor and cursor.close()
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
